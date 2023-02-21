@@ -1,36 +1,71 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: jwt-service-app
-  labels:
-    app: jwt-service-app
+  name: eureka-cm
+data:
+  eureka_service_address: http://eureka-0.eureka:8761/eureka
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka
+  labels: 
+    app: eureka
 spec:
-  replicas: 1
+  clusterIP: None
+  ports:
+  - port: 8761
+    name: eureka
   selector:
-    matchLabels:
-      app: jwt-service-app
-  template:
-    metadata:
-      labels:
-        app: jwt-service-app
-    spec:
-      containers:
-      - name: jwt-service-app
-        image: deepfunde20/jwt-service:0.0.1
-        imagePullPolicy: Always
-        ports: 
-          - containerPort: 8085
+    app: eureka
 
 ---
 
-kind: Service
-apiVersion: v1
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
-  name: jwt-service-svc
+  name: eureka
 spec:
   selector:
-    app: jwt-service-app
-  type: ClusterIP
+    matchLabels:
+      app: eureka
+  serviceName: eureka
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: eureka
+    spec:
+      containers:
+      - name: eureka
+        image: deepfunde20/service-registry:0.0.1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8761
+        env:
+          - name: EUREKA_SERVER_ADDRESS
+            valueFrom:
+              configMapKeyRef:
+                name: eureka-cm
+                key: eureka_service_address
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka-lb
+  labels:
+    app: eureka 
+spec:
+  selector:
+    app: eureka
+  type: NodePort
   ports:
   - port: 80
-    targetPort: 8085
+    targetPort: 8761
+
+
+
+

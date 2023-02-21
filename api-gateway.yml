@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-gateway-service-app
+  name: cloud-gateway-app
   labels:
-    app: api-gateway-service-app
+    app: cloud-gateway-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: api-gateway-service-app
+      app: cloud-gateway-app
   template:
     metadata:
       labels:
-        app: api-gateway-service-app
+        app: cloud-gateway-app
     spec:
       containers:
-      - name: api-gateway-service-app
+      - name: cloud-gateway-app
         image: deepfunde20/api-gateway:0.0.1
         imagePullPolicy: Always
         ports: 
@@ -26,11 +26,12 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: api-gateway-service-svc
+  name: cloud-gateway-svc
 spec:
   selector:
-    app: api-gateway-service-app
-  type: ClusterIP
+    app: cloud-gateway-app
+  type: LoadBalancer
   ports:
   - port: 80
     targetPort: 9191
+    protocol: TCP

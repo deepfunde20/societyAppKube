@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: member-service-app
+  labels:
+    app: member-service-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: member-service-app
+  template:
+    metadata:
+      labels:
+        app: member-service-app
+    spec:
+      containers:
+      - name: member-service-app
+        image: deepfunde20/member-service:0.0.1
+        imagePullPolicy: Always
+        ports: 
+          - containerPort: 8089
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: member-service-svc
+spec:
+  selector:
+    app: member-service-app
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8089
