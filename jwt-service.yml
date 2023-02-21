@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jwt-service-app
+  labels:
+    app: jwt-service-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jwt-service-app
+  template:
+    metadata:
+      labels:
+        app: jwt-service-app
+    spec:
+      containers:
+      - name: jwt-service-app
+        image: deepfunde20/jwt-service:0.0.1
+        imagePullPolicy: Always
+        ports: 
+          - containerPort: 8085
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: jwt-service-svc
+spec:
+  selector:
+    app: jwt-service-app
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8085

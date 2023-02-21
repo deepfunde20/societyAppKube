@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: group-service-app
+  labels:
+    app: group-service-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: group-service-app
+  template:
+    metadata:
+      labels:
+        app: group-service-app
+    spec:
+      containers:
+      - name: group-service-app
+        image: deepfunde20/group-service:0.0.1
+        imagePullPolicy: Always
+        ports: 
+          - containerPort: 8082
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: group-service-svc
+spec:
+  selector:
+    app: group-service-app
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8082
